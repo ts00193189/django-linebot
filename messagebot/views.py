@@ -3,12 +3,9 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
-from linebot.models import MessageEvent, TextSendMessage
 
-line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
-parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
+from messagebot.event_handle import handler
 
 def hello(request):
     return HttpResponse('hello world')
@@ -20,21 +17,14 @@ def callback(request):
         body = request.body.decode('utf-8')
 
         try:
-            events = parser.parse(body, signature)
-
+            handler.handle(body, signature)
         except InvalidSignatureError:
-
+            print('Invalid signature. Please check your channel access token/channel secret.')
             return HttpResponseForbidden()
-
         except LineBotApiError:
-
             return HttpResponseBadRequest()
-
-        for event in events:
-            if isinstance(event, MessageEvent):
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=event.message.text))
-        
 
         return HttpResponse()
     else:
         return HttpResponseBadRequest()
+
