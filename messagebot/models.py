@@ -3,18 +3,35 @@ import datetime
 from django.db import models
 
 # Create your models here.
-class Type(models.Model):
-    type = models.CharField(10, unique=True)
+class AccountingType(models.Model):
+    name = models.CharField(max_length=10, unique=True)
+
+    class Meta:
+        db_table = 'accounting_type'
+
+    def __str__(self):
+        return self.name
 
 
-class User(models.Model):
-    name = models.CharField(20, unique=True)
+class AccountingMember(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        db_table = 'accounting_member'
+
+    def __str__(self):
+        return self.name
 
 
-class Record(models.Model):
+class AccountingRecord(models.Model):
     cost = models.IntegerField()
-    note = models.CharField(100, blank=True, null=True)
+    note = models.CharField(max_length=100, blank=True, null=True)
     date = models.DateField(default=datetime.date.today)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    type_id = models.ForeignKey(Type, null=True, on_delete=models.SET_NULL)
+    member_id = models.ForeignKey(AccountingMember, on_delete=models.CASCADE, related_name='record')
+    accounting_type_id = models.ForeignKey(AccountingType, null=True, on_delete=models.SET_NULL, related_name='record')
 
+    class Meta:
+        db_table = 'accounting_record'
+
+    def __str__(self):
+        return '{} {} {} {} {}'.format(self.cost, self.member_id, self.accounting_type_id, self.date, self.note)

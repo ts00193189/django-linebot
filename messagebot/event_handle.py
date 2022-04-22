@@ -8,6 +8,8 @@ from linebot.models import TextSendMessage, ImageSendMessage
 from messagebot.request_cat import CatRequester
 from messagebot.request_weather import WeatherReportRequester
 
+#from .views import record_create
+
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
 
@@ -53,6 +55,13 @@ def handle_text_message(event):
             reply = '\n\n'.join(reply)
             reply += '\n這就是今天天氣啦(‧ω‧)/'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
+    elif '記帳' in event.message.text:
+        words = event.message.text.split(' ')
+        msg = words[1:]
+        if len(msg) < 4:
+            reply = '你缺少某些資訊喔，請給我 <身分> <類別> <金額> <日期> <備註> 的格式，備註以外的都要有喔'
+            # Try to create new record, if false, try to know why
+        #record_create(msg)
     else:
         reply = event.message.text
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
