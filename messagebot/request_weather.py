@@ -34,7 +34,6 @@ class WeatherReportRequester:
                     weather_report[element_map[weather_element['elementName']]] = weather_element['time'][idx]['parameter']['parameterName']
                 idx += 1
             reports.append(report)
-        #print(reports)
         return reports
 
     def get_data(self, locations):
@@ -64,6 +63,3 @@ class WeatherReportRequester:
             return None
 
         return location
-
-request = WeatherReportRequester()
-request.get_report(['台中', '台北'])
